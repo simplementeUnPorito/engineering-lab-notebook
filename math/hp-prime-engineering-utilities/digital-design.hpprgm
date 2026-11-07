@@ -1,0 +1,569 @@
+EXPORT ToBin32(dir)
+BEGIN
+  LOCAL addr, bin_str, i;
+
+  // Interpretar entrada: string hex o decimal, o número
+  IF TYPE(dir) == 2 THEN
+    IF MID(dir,1,2) == "0x" THEN
+      addr := CAS.eval(dir); // "0x84" → 132
+    ELSE
+      addr := expr(dir);     // "132"  → 132
+    END;
+  ELSE
+    addr := dir;             // 132    → 132
+  END;
+
+  // Convertir a binario manualmente
+  bin_str := "";
+  WHILE addr > 0 DO
+    bin_str := STRING(addr MOD 2) + bin_str;
+    addr := IP(addr / 2);
+  END;
+
+  // Rellenar con ceros a la izquierda hasta 32 bits
+  WHILE SIZE(bin_str) < 32 DO
+    bin_str := "0" + bin_str;
+  END;
+
+  RETURN bin_str;
+END;
+
+EXPORT SplitBin(bin_str, b_tag, b_idx, b_off)
+BEGIN
+  LOCAL tag_str, idx_str, off_str;
+
+  // Validación opcional
+  IF SIZE(bin_str) ≠ 32 THEN
+    RETURN "ERROR: Binario debe tener 32 bits";
+  END;
+
+  // Extraer subcadenas
+  tag_str := MID(bin_str, 1, b_tag);
+  idx_str := MID(bin_str, b_tag+1, b_idx);
+  off_str := MID(bin_str, b_tag + b_idx + 1, b_off);
+
+  RETURN {tag_str, idx_str, off_str};
+END;
+EXPORT DecToHex(n)
+BEGIN
+  LOCAL hex_chars := "0123456789ABCDEF";
+  LOCAL hex_str := "";
+  LOCAL r;
+
+  IF n == 0 THEN
+    RETURN "0";
+  END;
+
+  WHILE n > 0 DO
+    r := n MOD 16;
+    hex_str := MID(hex_chars, r+1, 1) + hex_str;
+    n := IP(n / 16);
+  END;
+
+  RETURN hex_str;
+END;
+
+EXPORT BinStrToDec(bin_str)
+BEGIN
+  LOCAL i, val := 0;
+  FOR i FROM 1 TO SIZE(bin_str) DO
+  val := val * 2 + expr(MID(bin_str, i, 1));
+  END;
+  RETURN val;
+END;
+EXPORT BinToHexDec(tag_str, idx_str, off_str)
+BEGIN
+  LOCAL tag_dec, idx_dec, off_dec;
+  LOCAL hex_tag, hex_idx, hex_off;
+
+  // Conversión binario → decimal segura
+  tag_dec := BinStrToDec(tag_str);
+  idx_dec := BinStrToDec(idx_str);
+  off_dec := BinStrToDec(off_str);
+
+  // Conversión manual a HEX
+  hex_tag := "0x" + DecToHex(tag_dec);
+  hex_idx := "0x" + DecToHex(idx_dec);
+  hex_off := "0x" + DecToHex(off_dec);
+
+  RETURN {
+    {tag_str, tag_dec, hex_tag},
+    {idx_str, idx_dec, hex_idx},
+    {off_str, off_dec, hex_off}
+  };
+END;
+
+EXPORT PadRight(s, ancho)
+BEGIN
+  WHILE SIZE(s) < ancho DO
+    s := s + " ";
+  END;
+  RETURN s;
+END;
+EXPORT EspaciarCada4Bits(bin_str)
+BEGIN
+  LOCAL out := "", i;
+  LOCAL len := SIZE(bin_str);
+
+  FOR i FROM 1 TO len DO
+    out := out + MID(bin_str, i, 1);
+
+    // Solo insertar espacio si faltan más de 1 dígito
+    IF ((len - i) MOD 4 == 0) AND (i ≠ len) THEN
+      out := out + " ";
+    END;
+  END;
+
+  RETURN out;
+END;
+
+
+
+EXPORT CDIR(dir, b_tag, b_idx, b_off)
+BEGIN
+  LOCAL bin_str, campos, tag_bin, idx_bin, off_bin;
+  LOCAL resultado;
+  LOCAL fila1, fila2, fila3;
+  LOCAL t_bin, t_dec, t_hex;
+  LOCAL i_bin, i_dec, i_hex;
+  LOCAL o_bin, o_dec, o_hex;
+  LOCAL max_len;
+
+  bin_str := ToBin32(dir);
+  campos := SplitBin(bin_str, b_tag, b_idx, b_off);
+  tag_bin := campos[1];
+  idx_bin := campos[2];
+  off_bin := campos[3];
+
+  IF tag_bin == "" OR idx_bin == "" OR off_bin == "" THEN
+    PRINT("Error: campos vacíos");
+    RETURN {};
+  END;
+
+  resultado := BinToHexDec(tag_bin, idx_bin, off_bin);
+
+  fila1 := resultado(1);
+  fila2 := resultado(2);
+  fila3 := resultado(3);
+
+  t_bin := fila1(1);  t_dec := fila1(2);  t_hex := fila1(3);
+  i_bin := fila2(1);  i_dec := fila2(2);  i_hex := fila2(3);
+  o_bin := fila3(1);  o_dec := fila3(2);  o_hex := fila3(3);
+  LOCAL len_t, len_i, len_o, max_bin_len;
+
+  // Encontrar la longitud máxima del campo binario
+  max_len := MAX(MAX(SIZE(t_bin), SIZE(i_bin)), SIZE(o_bin));
+
+  // Imprimir resultados
+  PRINT();
+  PRINT("Direccion binaria (32 bits):");
+  PRINT(EspaciarCada4Bits(ToBin32(dir)));
+  PRINT("");
+
+    LOCAL bin_t_str, bin_i_str, bin_o_str;
+  LOCAL linea_tag, linea_idx, linea_off;
+
+  // Agregar espacios a cada binario
+  bin_t_str := EspaciarCada4Bits(t_bin);
+  bin_i_str := EspaciarCada4Bits(i_bin);
+  bin_o_str := EspaciarCada4Bits(o_bin);
+
+  // Calcular ancho real con espacios
+  LOCAL len_t, len_i, len_o;
+
+  len_t := SIZE(bin_t_str);
+  len_i := SIZE(bin_i_str);
+  len_o := SIZE(bin_o_str);
+
+  IF len_t > len_i THEN
+    max_bin_len := len_t;
+  ELSE
+    max_bin_len := len_i;
+  END;
+
+  IF len_o > max_bin_len THEN
+    max_bin_len := len_o;
+  END;
+
+  // Formar cada línea de impresión como string único
+  linea_tag := "TAG  -> BIN: " + PadRight(bin_t_str, max_bin_len) + " | DEC: " + STRING(t_dec) + " | HEX: " + t_hex;
+  linea_idx := "IDX  -> BIN: " + PadRight(bin_i_str, max_bin_len) + " | DEC: " + STRING(i_dec) + " | HEX: " + i_hex;
+  linea_off := "OFF  -> BIN: " + PadRight(bin_o_str, max_bin_len) + " | DEC: " + STRING(o_dec) + " | HEX: " + o_hex;
+
+  // Imprimir todo con una línea por campo
+  PRINT();
+  PRINT("Direccion binaria (32 bits):");
+  PRINT(bin_str);
+  PRINT("");
+
+  PRINT(linea_tag);
+  PRINT(linea_idx);
+  PRINT(linea_off);
+
+  RETURN resultado;
+END;
+
+EXPORT HEXDIGIT(c)
+BEGIN
+  LOCAL hex := "0123456789ABCDEF";
+  RETURN INSTRING(hex, UPPER(c)) - 1;
+END;
+
+EXPORT IEEE754_TO_FLOAT32(n_str)
+BEGIN
+  LOCAL n, bin_str, sign_bit, exp_bits, frac_bits;
+  LOCAL s, e, m, val;
+  LOCAL i, raw_exp, mantisa_str;
+
+  // --- 1. Interpretar entrada ---
+  IF TYPE(n_str) == 0 THEN
+    n := n_str;
+  ELSE
+    IF LEFT(n_str,2) == "0x" THEN
+      n := 0;
+      FOR i FROM 1 TO SIZE(n_str)-2 DO
+        n := n * 16 + HEXDIGIT(MID(n_str, i + 2, 1));
+      END;
+    ELSE
+      IF SIZE(n_str) == 32 THEN
+        n := 0;
+        FOR i FROM 1 TO 32 DO
+          n := n * 2 + expr(MID(n_str,i,1));
+        END;
+      ELSE
+        RETURN "Error: Entrada inválida";
+      END;
+    END;
+  END;
+
+  // --- 2. Convertir a binario de 32 bits ---
+  bin_str := ToBin32(n);
+
+  // --- 3. Separar campos binarios ---
+  sign_bit := MID(bin_str,1,1);
+  exp_bits := MID(bin_str,2,8);
+  frac_bits := MID(bin_str,10,23);
+
+  // --- 4. Calcular valores reales ---
+  s := expr(sign_bit);
+  raw_exp := BinStrToDec(exp_bits);
+  e := raw_exp - 127;
+
+  m := 1;
+  FOR i FROM 1 TO 23 DO
+    IF MID(frac_bits,i,1) == "1" THEN
+      m := m + 1 / (2^i);
+    END;
+  END;
+
+  val := m * (2^e);
+  IF s == 1 THEN
+    val := -val;
+  END;
+
+  // --- 5. Formar resumen
+  RETURN {
+    val,
+    "SIGN   : " + sign_bit,
+    "EXP    : " + exp_bits + " = " + STRING(raw_exp) + " (real = " + STRING(e) + ")",
+    "MANTISA: 1." + frac_bits + " = " + STRING(m)
+  };
+END;
+
+EXPORT HexToInt_TwosComplement(hex_str, nbits)
+BEGIN
+  LOCAL i, dec := 0;
+
+  // Remover prefijo "0x" si existe
+  IF LEFT(hex_str,2) == "0x" THEN
+    hex_str := MID(hex_str,3);
+  END;
+
+  // Convertir hex a decimal puro
+  FOR i FROM 1 TO SIZE(hex_str) DO
+    dec := dec * 16 + HEXDIGIT(MID(hex_str,i,1));
+  END;
+
+  // Verificar bit de signo
+  IF dec ≥ 2^(nbits - 1) THEN
+    dec := dec - 2^nbits;
+  END;
+
+  RETURN dec;
+END;
+
+EXPORT FLOAT32_TO_IEEE754(...args)
+BEGIN
+  LOCAL x, modo;
+  LOCAL signo, exp_bias, mantisa, bin_exp, bin_mantisa;
+  LOCAL val_abs, bin_str := "", hex_str := "", i, exponente;
+  LOCAL bits_ext := ""; // bits para redondeo
+
+  // Obtener argumentos
+  x := args(1);
+  IF SIZE(args) ≥ 2 THEN
+    modo := args(2);
+  ELSE
+    modo := 0; // truncar por defecto
+  END;
+
+  // 1. Signo
+  signo := IFTE(x < 0, 1, 0);
+  val_abs := ABS(x);
+
+  // 2. Buscar exponente tal que 1 ≤ x / 2^e < 2
+  exponente := 0;
+  IF val_abs ≥ 2 THEN
+    WHILE val_abs / (2^exponente) ≥ 2 DO
+      exponente := exponente + 1;
+    END;
+  ELSE
+    WHILE val_abs / (2^exponente) < 1 DO
+      exponente := exponente - 1;
+    END;
+  END;
+
+  exp_bias := exponente + 127;
+
+  // 3. Mantisa sin bit oculto
+  mantisa := val_abs / (2^exponente) - 1;
+
+  // 4. Exponente a binario (8 bits)
+  bin_exp := "";
+  i := exp_bias;
+  WHILE SIZE(bin_exp) < 8 DO
+    bin_exp := STRING(i MOD 2) + bin_exp;
+    i := IP(i / 2);
+  END;
+
+  // 5. Mantisa a binario (23 + extras para redondeo)
+  bin_mantisa := "";
+  FOR i FROM 1 TO 26 DO
+    mantisa := mantisa * 2;
+    IF mantisa ≥ 1 THEN
+      IF i <= 23 THEN
+        bin_mantisa := bin_mantisa + "1";
+      ELSE
+        bits_ext := bits_ext + "1";
+      END;
+      mantisa := mantisa - 1;
+    ELSE
+      IF i <= 23 THEN
+        bin_mantisa := bin_mantisa + "0";
+      ELSE
+        bits_ext := bits_ext + "0";
+      END;
+    END;
+  END;
+
+  // 5.b Redondear si corresponde
+  IF modo == 1 THEN
+    LOCAL guard := MID(bits_ext,1,1);
+    LOCAL round := MID(bits_ext,2,1);
+    LOCAL sticky := "0";
+    IF SIZE(bits_ext) ≥ 3 THEN
+      sticky := MID(bits_ext,3,1);
+    END;
+
+    IF guard == "1" AND (round == "1" OR sticky == "1" OR RIGHT(bin_mantisa,1) == "1") THEN
+      LOCAL suma := BinStrToDec(bin_mantisa) + 1;
+      IF suma == 2^23 THEN
+        bin_mantisa := "00000000000000000000000";
+        exp_bias := exp_bias + 1;
+        bin_exp := "";
+        i := exp_bias;
+        WHILE SIZE(bin_exp) < 8 DO
+          bin_exp := STRING(i MOD 2) + bin_exp;
+          i := IP(i / 2);
+        END;
+      ELSE
+        bin_mantisa := ToBin32(suma);
+        bin_mantisa := RIGHT(bin_mantisa,23);
+      END;
+    END;
+  END;
+
+  LOCAL es_exacto := (mantisa == 0);
+
+// 6. Armar binario resultante
+  bin_str := STRING(signo) + bin_exp + bin_mantisa;
+
+  // 7. Hex
+  hex_str := "";
+  FOR i FROM 1 TO 32 STEP 4 DO
+    hex_str := hex_str + DecToHex(BinStrToDec(MID(bin_str, i, 4)));
+  END;
+
+  // 8. Imprimir
+  PRINT();
+  PRINT("Decimal: " + STRING(x));
+  PRINT("IEEE 754 (float32):");
+  PRINT("BIN  : " + EspaciarCada4Bits(bin_str));
+  PRINT("HEX  : 0x" + hex_str);
+  PRINT("SIGN : " + signo);
+  PRINT("EXP  : " + EspaciarCada4Bits(bin_exp) + " = " + STRING(exp_bias) + " (real = " + STRING(exponente) + ")");
+  PRINT("MANT : " + EspaciarCada4Bits(bin_mantisa));
+  IF es_exacto THEN
+    PRINT("Se puede representar EXACTAMENTE.");
+  ELSE
+    IF modo == 1 THEN
+      PRINT("No exacto, redondeado.");
+    ELSE
+      PRINT("NO se puede representar exactamente (truncado).");
+    END;
+  END;
+
+  RETURN {bin_str, "0x" + hex_str, signo, bin_exp, bin_mantisa};
+END;
+
+EXPORT CASOCOMP(dir, b_tag, b_off)
+BEGIN
+  LOCAL bin_str, tag_bin, off_bin;
+  LOCAL t_dec, o_dec, t_hex, o_hex;
+  LOCAL bin_t_str, bin_o_str;
+  LOCAL max_len, linea_tag, linea_off;
+  LOCAL dec_dir, hex_dir;
+
+  // --- Asegurar entrada como número ---
+  IF TYPE(dir) == 2 THEN
+    IF MID(dir,1,2) == "0x" THEN
+      dec_dir := CAS.eval(dir);
+    ELSE
+      dec_dir := expr(dir);
+    END;
+  ELSE
+    dec_dir := dir;
+  END;
+
+  // --- Obtener representaciones ---
+  hex_dir := "0x" + DecToHex(dec_dir);
+  bin_str := ToBin32(dec_dir);
+
+  // --- Separar campos ---
+  tag_bin := MID(bin_str, 1, b_tag);
+  off_bin := MID(bin_str, b_tag + 1, b_off);
+
+  // --- Conversión a decimal y hexadecimal ---
+  t_dec := BinStrToDec(tag_bin);
+  o_dec := BinStrToDec(off_bin);
+  t_hex := "0x" + DecToHex(t_dec);
+  o_hex := "0x" + DecToHex(o_dec);
+
+  // --- Formatear binarios con espacios ---
+  bin_t_str := EspaciarCada4Bits(tag_bin);
+  bin_o_str := EspaciarCada4Bits(off_bin);
+  max_len := MAX(SIZE(bin_t_str), SIZE(bin_o_str));
+
+  // --- Armar texto alineado ---
+  linea_tag := "TAG  -> BIN: " + PadRight(bin_t_str, max_len) + " | DEC: " + STRING(t_dec) + " | HEX: " + t_hex;
+  linea_off := "OFF  -> BIN: " + PadRight(bin_o_str, max_len) + " | DEC: " + STRING(o_dec) + " | HEX: " + o_hex;
+
+  // --- Mostrar todo ---
+  PRINT("Direccion:");
+  PRINT("DEC: " + STRING(dec_dir));
+  PRINT("HEX: " + hex_dir);
+  PRINT("BIN: " + EspaciarCada4Bits(bin_str));
+  PRINT("");
+  PRINT(linea_tag);
+  PRINT(linea_off);
+
+  RETURN {
+    {bin_str, dec_dir, hex_dir},
+    {tag_bin, t_dec, t_hex},
+    {off_bin, o_dec, o_hex}
+  };
+END;
+
+
+
+
+EXPORT HELP()
+BEGIN
+  PRINT();
+  PRINT("====== AYUDA (1/7) ======");
+  PRINT("ToBin32(dir):");
+  PRINT(" Convierte un número (decimal o");
+  PRINT(" '0x...' hexadecimal) a una cadena");
+  PRINT(" binaria de 32 bits.");
+  PRINT("");
+  PRINT("SplitBin(bin_str, tag, idx, off):");
+  PRINT(" Divide un string binario (32 bits)");
+  PRINT(" en TAG, INDEX y OFFSET según tamaños.");
+  PRINT("");
+  PRINT("Presione [OK]...");
+  WAIT;
+
+  PRINT();
+  PRINT("====== AYUDA (2/7) ======");
+  PRINT("DecToHex(n):");
+  PRINT(" Convierte un número entero positivo");
+  PRINT(" en su cadena hexadecimal (ej: 255 → FF).");
+  PRINT("");
+  PRINT("BinStrToDec(s):");
+  PRINT(" Convierte una cadena binaria a");
+  PRINT(" su valor decimal (ej: '1010' → 10).");
+  PRINT("");
+  PRINT("Presione [OK]...");
+  WAIT;
+
+  PRINT();
+  PRINT("====== AYUDA (3/7) ======");
+  PRINT("BinToHexDec(tag,idx,off):");
+  PRINT(" Convierte TAG, INDEX y OFFSET binarios");
+  PRINT(" a decimal y hexadecimal.");
+  PRINT("");
+  PRINT("PadRight(s,n):");
+  PRINT(" Añade espacios a la derecha de un");
+  PRINT(" string hasta alcanzar largo 'n'.");
+  PRINT("");
+  PRINT("Presione [OK]...");
+  WAIT;
+
+  PRINT();
+  PRINT("====== AYUDA (4/7) ======");
+  PRINT("EspaciarCada4Bits(s):");
+  PRINT(" Inserta espacios cada 4 bits");
+  PRINT(" en una cadena binaria.");
+  PRINT("");
+  PRINT("CDIR(dir,t,i,o):");
+  PRINT(" Analiza una dirección de 32 bits y");
+  PRINT(" muestra TAG, INDEX y OFFSET.");
+  PRINT("");
+  PRINT("Presione [OK]...");
+  WAIT;
+
+  PRINT();
+  PRINT("====== AYUDA (5/7) ======");
+  PRINT("HEXDIGIT(c):");
+  PRINT(" Devuelve el valor decimal de un");
+  PRINT(" carácter hexadecimal ('A' → 10).");
+  PRINT("");
+  PRINT("IEEE754_TO_FLOAT32(x):");
+  PRINT(" Interpreta un binario o hex como");
+  PRINT(" número float IEEE754 (32 bits).");
+  PRINT("");
+  PRINT("Presione [OK]...");
+  WAIT;
+
+  PRINT();
+  PRINT("====== AYUDA (6/7) ======");
+  PRINT("FLOAT32_TO_IEEE754(x):");
+  PRINT(" Convierte un número decimal a");
+  PRINT(" su representación IEEE754 bin/hex.");
+  PRINT("");
+  PRINT("HexToInt_TwosComplement(h,n):");
+  PRINT(" Interpreta 'h' como número firmado");
+  PRINT(" de n bits en complemento a 2.");
+  PRINT("");
+  PRINT("Presione [OK]...");
+  WAIT;
+  PRINT();
+
+    PRINT("====== AYUDA (7/7) ======");
+PRINT("CASOCOMP(dir,tg,off): ");
+PRINT(" Analiza cache completamente asociativa");
+  PRINT("");
+  PRINT("Fin de ayuda.");
+END;
+
+

@@ -1,0 +1,18 @@
+EXPORT ST_XandS(list)
+BEGIN
+   LOCAL i,x,s;
+   x:=0;
+   FOR i FROM 1 TO SIZE(list) DO
+     x:=x+list(i);
+   END;
+   x:=x/SIZE(list);
+   
+   s:=0;
+   FOR i FROM 1 to SIZE(list) DO
+     s:=s+(list(i)-x)^2;
+   END;
+   s:=sqrt(s/SIZE(list));
+   
+   RETURN {x,s};
+
+END;

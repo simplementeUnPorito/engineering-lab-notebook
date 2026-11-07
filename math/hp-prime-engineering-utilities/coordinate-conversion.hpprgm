@@ -1,0 +1,17 @@
+EXPORT RectangularToSpherical(x, y, z)
+BEGIN
+    LOCAL r, φ, phi;
+    r := SQRT(x^2 + y^2 + z^2);
+    φ := ATAN(y/x);
+    phi := ACOS(z / r);
+    RETURN {r, φ, phi};
+END;
+
+EXPORT SphericalToRectangular(r, φ, phi)
+BEGIN
+    LOCAL x, y, z;
+    x := r * COS(φ) * SIN(phi);
+    y := r * SIN(φ) * SIN(phi);
+    z := r * COS(φ);
+    RETURN {x, y, z};
+END;

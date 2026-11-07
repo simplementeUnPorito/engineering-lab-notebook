@@ -1,0 +1,71 @@
+EXPORT ║(a,b,...c)
+BEGIN
+  LOCAL rp,i,list;
+  list:=concat(a,b,c);
+  rp:=0;
+  FOR i FROM 1 TO SIZE(list) DO
+    rp:=rp+1/list(i);
+  END;
+  RETURN 1/rp;
+END;
+
+
+EXPORT DTZ_DCA(Vs,R1,R2,...Rn)
+BEGIN
+  LOCAL V,R,Re,i;
+  R:=concat(R1,R2,Rn);
+  V:=concat(R1,R2,Rn);
+  Re=0;
+  FOR i FROM 1 TO SIZE(R) DO
+    Re:=Re+R(i);
+  END;
+  FOR i FROM 1 TO SIZE(R) DO
+    V(i):=Vs*R(i)/Re;
+  END;
+  RETURN V;
+END;
+
+
+EXPORT DTA_DCZ(Vs,R1,R2,...Rn)
+BEGIN
+  LOCAL V,R,Re,i;
+  R:=concat(R1,R2,Rn);
+  V:=concat(R1,R2,Rn);
+  Re=0;
+  FOR i FROM 1 TO SIZE(R) DO
+    Re:=Re+1/R(i);
+  END;
+  Re:=1/Re;
+  FOR i FROM 1 TO SIZE(R) DO
+    V(i):=Vs*Re/R(i);
+  END;
+  RETURN V;
+END;
+
+EXPORT YaΔ(r1,r2,r3)
+BEGIN
+ 
+  LOCAL rn,ra,rb,rc;
+  rn:=r1*r2+r2*r3+r1*r3;
+  ra:=rn/r1;
+  rb:=rn/r2;
+  rc:=rn/r3;
+  print("Para {Rab,Rbc,Rca}<==>{Rcn,Ran,Rbn}");
+  RETURN {ra,rb,rc};
+  
+END;
+
+
+
+
+EXPORT ΔaY(ra,rb,rc)
+BEGIN
+ 
+  LOCAL rd,r1,r2,r3;
+  rd:=ra+rb+rc;
+  r1:=(rb*rc)/rd;
+  r2:=(ra*rc)/rd;
+  r3:=(ra*rb)/rd;
+  print("Para {Rab,Rbc,Rca}<==>{Rcn,Ran,Rbn}");
+  RETURN {r1,r2,r3};
+END;

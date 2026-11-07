@@ -1,0 +1,136 @@
+EXPORT DeltaWye()
+
+BEGIN
+LOCAL   green:=rgb(50,200,120),
+black:=rgb(0,0,0);
+DIMGROB_P(G1,320,240);
+RECT(G1);
+//1
+LINE_P(G1,96,140,118,96,black);//L1
+LINE_P(G1,118,96,132,104,black);//L2
+LINE_P(G1,132,104,111,148,black);//L3
+LINE_P(G1,110,148,96,140,black);//L4
+//2
+LINE_P(G1,152,70,168,70,black);//L1
+LINE_P(G1,168,70,168,120,black);//L2
+LINE_P(G1,168,120,152,120,black);//L3
+LINE_P(G1,152,120,152,70,black);//L4
+//3
+LINE_P(G1,189,104,202,96,black);//L1
+LINE_P(G1,202,96,225,137,black);//L2
+LINE_P(G1,224,138,212,145,black);//L3
+LINE_P(G1,212,145,189,104,black);//L4
+//4
+LINE_P(G1,94,182,132,158,black);//L5
+LINE_P(G1,132,158,140,172,black);//L6
+LINE_P(G1,140,172,102,195,black);//L7
+LINE_P(G1,102,195,94,182,black);//8
+//5
+LINE_P(G1,180,172,188,158,black);//9
+LINE_P(G1,188,158,228,182,black);//L10
+LINE_P(G1,228,182,220,196,black);//L11
+LINE_P(G1,220,196,180,172,black);//L12
+//6
+LINE_P(G1,138,200,182,200,black);//L13
+LINE_P(G1,182,200,182,218,black);//L14
+LINE_P(G1,182,218,138,218,black);//L15
+LINE_P(G1,138,218,138,200,black);//L16
+
+LINE_P(G1,68,208,103,143,black);//L1
+LINE_P(G1,125,100,160,35,black);//L2
+LINE_P(G1,160,35,195,100,black);//L3
+LINE_P(G1,218,143,252,208,black);//L4
+LINE_P(G1,182,208,252,208,black);//L5
+LINE_P(G1,68,208,138,208,black);//L6
+LINE_P(G1,160,35,160,70,black);//L7
+LINE_P(G1,224,190,252,208,black);//L8
+LINE_P(G1,68,208,97,190,black);//L9
+LINE_P(G1,160,120,160,145,black);//L10
+LINE_P(G1,155,152,135,165,black);//L11
+LINE_P(G1,165,152,185,165,black);//L12
+
+TEXTOUT_P("Solve (Delta, Wye) Circuit.",G1,80,8);
+TEXTOUT_P("Wait 1min. or Press Enter.",G1,90,220);
+TEXTOUT_P("a",G1,50,210);
+TEXTOUT_P("b",G1,265,210);
+TEXTOUT_P("c",G1,170,25);
+TEXTOUT_P("ZB",G1,109,112);
+TEXTOUT_P("ZC",G1,152,202);
+TEXTOUT_P("ZA",G1,199,112);
+TEXTOUT_P("Z",G1,109,173);
+TEXTOUT_P("Z",G1,156,81);
+TEXTOUT_P("Z",G1,193,166);
+TEXTOUT_P("1",G1,119,167);//E1
+TEXTOUT_P("2",G1,205,172);//E2
+TEXTOUT_P("3",G1,156,95);//E3
+//TEXTOUT_P("+-",G1,300,115);//E4
+ARC_P(G1,64,211,5,black);//a
+ARC_P(G1,256,211,5,black);//b
+ARC_P(G1,160,30,5,black);//c
+ARC_P(G1,160,150,5,black);//ctr
+
+
+
+BLIT_P(G0,0,0,320,240,G1,0,0,320,240);
+
+WAIT;
+
+LOCAL Z1:=0,Z2:=0,Z3:=0;
+LOCAL Z4:=0,Z5:=0,Z6:=0,Z7:=0,Z8:=0;
+
+PRINT();
+INPUT({{Z1,[3],{30,20,2}},{Z2,[3],{70,20,2}},{Z3,[3],{50,20,0}},
+{Z5,[3],{30,20,4}},{Z4,[3],{70,20,4}},{Z6,[3],{50,20,6}}},
+"Delta <--> Wye",{"Z1=","Z2=","Z3=","ZB=","ZA=","ZC="},
+{"  Enter value for Z1, (R,±X).","  Enter value for Z3, (R,±X).","  Enter value for Z2, (R,±X).",
+"  Enter value for ZB, (R,±X).","  Enter value for ZA, (R,±X).","  Enter value for ZC, (R,±X)."});
+IF 0 THEN BREAK;
+END;
+CASE
+IF Z1==0 AND Z2==0 AND Z3==0 AND Z4==0 AND Z5==0 AND Z6==0 THEN
+PRINT("   
+
+               Z1,Z2,Z3 or ZA,ZB,ZC  cannot be 0!
+
+                     Enter proper values.
+                  
+
+                Press [ENTER] to continue");
+END;
+IF Z1≠0 AND Z2≠0 AND Z3≠0 THEN
+Z8:=(Z1*Z2)+(Z1*Z3)+(Z2*Z3);
+Z4:=Z8/Z1; Z5:=Z8/Z2; Z6:=Z8/Z3;
+PRINT("
+
+
+  ZA rec= "+rectangular_coordinates(Z4)+"
+       pol= "+polar_coordinates(Z4)+ "
+
+  ZB rec= "+rectangular_coordinates(Z5)+"
+       pol= "+polar_coordinates(Z5)+ "
+
+  ZC rec= "+rectangular_coordinates(Z6)+"
+       pol= "+polar_coordinates(Z6)+ "
+
+                  Press  [Enter] to continue" );
+END;
+IF Z4≠0 AND Z5≠0 AND Z6≠0 THEN
+Z7:=Z4+Z5+Z6;
+Z1:=(Z5*Z6)/Z7; Z2:=(Z4*Z6)/Z7; Z3:=(Z4*Z5)/Z7;
+PRINT("
+
+
+  Z1 rec= "+rectangular_coordinates(Z1)+"
+       pol= "+polar_coordinates(Z1)+ "
+
+  Z2 rec= "+rectangular_coordinates(Z2)+"
+       pol= "+polar_coordinates(Z2)+ "
+
+  Z3 rec= "+rectangular_coordinates(Z3)+"
+       pol= "+polar_coordinates(Z3)+ "
+
+                  Press  [Enter] to continue" );
+
+END;
+END;
+END;
