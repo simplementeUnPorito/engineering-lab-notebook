@@ -1,6 +1,6 @@
 <p align="center"><img src="docs/img/banner.svg" width="100%" alt="Engineering Lab Notebook"></p>
 
-<p align="center"><img src="https://img.shields.io/badge/MATLAB-Simulink-orange" alt="MATLAB and Simulink"> <img src="https://img.shields.io/badge/Python-Jupyter-3776ab" alt="Python and Jupyter"> <img src="https://img.shields.io/badge/PSpice-OrCAD-2b579a" alt="PSpice and OrCAD"> <img src="https://img.shields.io/badge/HDL-VHDL-6f42c1" alt="VHDL"> <img src="https://img.shields.io/badge/Embedded-C-00599c" alt="Embedded C"></p>
+<p align="center"><img src="https://img.shields.io/badge/Year-2021--2026-555"> <img src="https://img.shields.io/badge/MATLAB-Simulink-orange" alt="MATLAB and Simulink"> <img src="https://img.shields.io/badge/Python-Jupyter-3776ab" alt="Python and Jupyter"> <img src="https://img.shields.io/badge/PSpice-OrCAD-2b579a" alt="PSpice and OrCAD"> <img src="https://img.shields.io/badge/HDL-VHDL-6f42c1" alt="VHDL"> <img src="https://img.shields.io/badge/Embedded-C-00599c" alt="Embedded C"></p>
 <p align="center"><a href="#english">English</a> · <a href="#español">Español</a></p>
 
 ## English
