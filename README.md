@@ -66,7 +66,16 @@ Este repositorio es un cuaderno de ingeniería con experimentos, simulaciones y 
 
 ### Organización
 
-Cada tema contiene una tabla con sus elementos, herramientas y fechas. Cada elemento ocupa una carpeta autocontenida con el conjunto mínimo de fuentes útil; algunas carpetas `fig/` guardan resultados representativos. Un guion largo en la columna de año indica que el artefacto original no ofrecía una fecha verificable.
+Cada tema contiene una tabla con sus elementos, herramientas y fechas. Cada elemento ocupa una carpeta autocontenida con el conjunto mínimo de fuentes útil; algunas carpetas `fig/` guardan resultados representativos. Una raya en la columna de año indica que el artefacto original no ofrecía una fecha verificable.
+
+### Apertura de los archivos
+
+- Abra los archivos `.ipynb` en JupyterLab o Google Colab.
+- Ejecute los archivos `.m` en MATLAB; abra los modelos `.slx` en Simulink.
+- Abra los esquemáticos `.dsn` con OrCAD Capture y PSpice.
+- Compile los proyectos `.cyprj` con PSoC Creator 4.x.
+- Agregue las fuentes VHDL, los bancos de prueba y las restricciones `.xdc` a un proyecto Vivado.
+- Abra los archivos `.trk` con Tracker Video Analysis.
 
 ### Licencia
 
