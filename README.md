@@ -19,10 +19,11 @@ This is a lab notebook of experiments, simulations and learning prototypes devel
 | [Digital](digital/README.md) | 2 | Small VHDL designs with testbenches and constraints |
 | [Embedded](embedded/README.md) | 3 | PSoC C/assembly programs and peripheral experiments |
 | [RF & communications](rf-comms/README.md) | 4 | FM and nonlinear-modulation notebooks |
+| [Networking](networking/README.md) | 1 | Dynamic routing and link-failure behavior |
 | [Physics](physics/README.md) | 5 | Tracker measurements and compact physical demonstrations |
 | [Programming](programming/README.md) | 5 | Self-contained C programs and algorithm exercises |
 | [Mathematics](math/README.md) | 11 | Transform methods, signal mathematics and calculator utilities |
-| **Total** | **52** | |
+| **Total** | **53** | |
 
 ### Repository layout
 
@@ -57,10 +58,11 @@ Este repositorio es un cuaderno de ingeniería con experimentos, simulaciones y 
 | [Digital](digital/README.md) | 2 | Diseños VHDL pequeños con bancos de prueba y restricciones |
 | [Embebidos](embedded/README.md) | 3 | Programas C/assembly para PSoC y pruebas de periféricos |
 | [RF y comunicaciones](rf-comms/README.md) | 4 | Cuadernos de FM y modulación no lineal |
+| [Redes](networking/README.md) | 1 | Enrutamiento dinámico y comportamiento ante fallas de enlace |
 | [Física](physics/README.md) | 5 | Mediciones con Tracker y demostraciones físicas compactas |
 | [Programación](programming/README.md) | 5 | Programas autocontenidos en C y algoritmos |
 | [Matemática](math/README.md) | 11 | Transformadas, matemática de señales y utilidades de calculadora |
-| **Total** | **52** | |
+| **Total** | **53** | |
 
 ### Organización
 
